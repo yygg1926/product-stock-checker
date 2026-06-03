@@ -139,33 +139,32 @@ def main():
     driver = create_driver()
 
     try:
-        while True:
-            print("=" * 50)
-            print("재고 확인 시작")
+        print("=" * 50)
+        print("재고 확인 시작")
 
-            for product in PRODUCTS:
-                try:
-                    product_name = product["name"]
-                    in_stock = check_stock(driver, product)
+        for product in PRODUCTS:
+            try:
+                product_name = product["name"]
+                in_stock = check_stock(driver, product)
 
-                    if in_stock and product_name not in already_alerted:
-                        message = (
-                            f"재입고 가능성이 있습니다!\n\n"
-                            f"상품명: {product_name}\n"
-                            f"URL: {product['url']}"
-                        )
-                        send_telegram(message)
-                        already_alerted.add(product_name)
+                if in_stock and product_name not in already_alerted:
+                    message = (
+                        f"재입고 가능성이 있습니다!\n\n"
+                        f"상품명: {product_name}\n"
+                        f"URL: {product['url']}"
+                    )
+                    send_telegram(message)
+                    already_alerted.add(product_name)
 
-                    elif not in_stock:
-                        print(f"아직 품절 상태로 보입니다: {product_name}")
+                elif not in_stock:
+                    print(f"아직 품절 상태로 보입니다: {product_name}")
 
-                except Exception as e:
-                    print(f"오류 발생: {product['name']}")
-                    print(e)
+            except Exception as e:
+                print(f"오류 발생: {product['name']}")
+                print(e)
 
-            print(f"{CHECK_INTERVAL_SECONDS}초 후 다시 확인합니다.")
-            time.sleep(CHECK_INTERVAL_SECONDS)
+        print(f"{CHECK_INTERVAL_SECONDS}초 후 다시 확인합니다.")
+        time.sleep(CHECK_INTERVAL_SECONDS)
 
     finally:
         driver.quit()
