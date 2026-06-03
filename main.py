@@ -163,8 +163,7 @@ def main():
                 print(f"오류 발생: {product['name']}")
                 print(e)
 
-        print(f"{CHECK_INTERVAL_SECONDS}초 후 다시 확인합니다.")
-        time.sleep(CHECK_INTERVAL_SECONDS)
+        print("재고 확인 완료")
 
     finally:
         driver.quit()
