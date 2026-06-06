@@ -19,12 +19,12 @@ CHECK_INTERVAL_SECONDS = int(os.getenv("CHECK_INTERVAL_SECONDS", "300"))
 
 PRODUCTS = [
     {
-        "name": "Sony RX100M7 - 소니스토어",
-        "url": "https://store.sony.co.kr/product-view/102263765",
+        "name": "Ricoh GR4 - 사에키",
+        "url": "https://www.saeki.co.kr/item/itemDetail?itemId=PD00041564",
     },
     {
-        "name": "Sony RX100M7G - 소니스토어",
-        "url": "https://store.sony.co.kr/product-view/102263764",
+        "name": "Ricoh GR4 (다른 옵션) - 사에키",
+        "url": "https://www.saeki.co.kr/item/itemDetail?itemId=PD00042145",
     }
 ]
 
@@ -77,63 +77,28 @@ def check_stock(driver, product: dict) -> bool:
 
     wait.until(
         EC.presence_of_element_located(
-            (By.CSS_SELECTOR, "div.product_view_about")
+            (By.CSS_SELECTOR, "div.btn-area.type-ui")
         )
     )
 
-    # 1차 판단: 상품 영역에 soldout 클래스가 붙어 있으면 품절
-    soldout_area = driver.find_elements(
-        By.CSS_SELECTOR,
-        "div.product_view_about.soldout"
-    )
-
-    # 2차 판단: 최종 구매 버튼 확인
-    final_button = wait.until(
-        EC.presence_of_element_located(
-            (By.CSS_SELECTOR, "li.final a.btn_style")
-        )
-    )
-
-    button_text = final_button.text.strip()
-    button_class = final_button.get_attribute("class") or ""
-    button_html = final_button.get_attribute("outerHTML") or ""
+    soldout_btn = driver.find_elements(By.ID, "btnWhrcvNotice")
+    buy_btn = driver.find_elements(By.ID, "btnBuyNow")
 
     print(f"[확인] {name}")
-    print(f"품절 영역 있음: {len(soldout_area) > 0}")
-    print(f"버튼 텍스트: {button_text}")
-    print(f"버튼 class: {button_class}")
-    print("버튼 HTML:")
-    print(button_html)
-    # test code
-    # if button_text in ["품절", "일시품절", "재입고 알림", "구매불가"]:
-    #     return True
+    print(f"입고알림 버튼 있음(품절): {len(soldout_btn) > 0}")
+    print(f"바로구매 버튼 있음(재고): {len(buy_btn) > 0}")
 
-    # if soldout_area:
-    #     return False
-
-    # if "disabled" in button_class:
-    #     return False
-
-    # if button_text in ["구매하기", "바로구매", "구매", "예약구매"]:
-    #     return False
-
-    if soldout_area:
-        return False
-
-    if "disabled" in button_class:
-        return False
-
-    if button_text in ["품절", "일시품절", "재입고 알림", "구매불가"]:
-        return False
-
-    if button_text in ["구매하기", "바로구매", "구매", "예약구매"]:
+    if buy_btn:
         return True
 
-    print(f"알 수 없는 버튼 상태입니다: {button_text}")
+    if soldout_btn:
+        return False
+
+    print(f"알 수 없는 버튼 상태입니다: {name}")
     return False
 
 def main():
-    send_telegram("RX100M7 재고 감시를 시작합니다.")
+    send_telegram("GR4 재고 감시를 시작합니다.")
 
     already_alerted = set()
     driver = create_driver()
